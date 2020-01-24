@@ -1,9 +1,9 @@
 ---
-title: "Advanced analytics on Budweiser data"
-output: html_document
-author: Simerpreet Reddy
-date: "Jan/19/2020"
-
+title: "SMU DDS Case Study:Advanced analytics on Budweiser data"
+author: "Simerpreet Reddy"
+date: "Jan/22/2020"
+output:
+  word_document: default
 ---
 ## Purpose
 
@@ -91,7 +91,7 @@ text(y = boxplot.stats(Beer_Breweries_raw$ABV)$stats, labels = boxplot.stats(Bee
 message("As the data has outliers and the mean is sensitive to outliers, we will replace the missing values by the corresponding median in each Beer Category")
 
 #Assigning Beer Categories: Read the Beer_Style and assign the following categories: IPA- if the column Beer Style has IPA in its name, else 'Other Ales' if name has 'Ale' in its name and assign 'Other' to all the other types of beers. 
-Beer_Breweries_raw$Beer_Category <- ifelse(str_detect(Beer_Breweries_raw$Beer_Style, "IPA"), 'IPA', ifelse(str_detect(Beer_Breweries_raw$Beer_Name, "Ale"),'Other Ale','Other'))
+Beer_Breweries_raw$Beer_Category <- ifelse(str_detect(Beer_Breweries_raw$Beer_Style, "IPA"), 'IPA', ifelse(str_detect(Beer_Breweries_raw$Beer_Style, "Ale"),'Other Ale','Other'))
 
 #Calculate median ABV for each Beer categy.
 Median_ABV_by_St_IPAorAle <- Beer_Breweries_raw%>% group_by(Beer_Category) %>% summarise(Median_ABV = median(ABV, na.rm=TRUE))
@@ -291,12 +291,12 @@ which.max(mean_Acc)
 #Print the max accuracy of the model
 max(mean_Acc)
 
-message("By running KNN for different samples and different values of K, we can see the knn model accuracy is highest at k=3. So performing internal validation at KNN at k=3")
+message("By running KNN for different samples and different values of K, we can see the knn model accuracy is highest at k=5. So performing internal validation at KNN at k=5")
 #Perform internal validation with knn with knn=3
 
-knn3 <- knn.cv(Beer_Breweries_8_knn_data[, c(3,4)],Beer_Breweries_8_knn_data$Beer_Category, k=3 )
+knn5 <- knn.cv(Beer_Breweries_8_knn_data[, c(3,4)],Beer_Breweries_8_knn_data$Beer_Category, k=5 )
 
-t_knn <- table(knn3,Beer_Breweries_8_knn_data$Beer_Category )
+t_knn <- table(knn5,Beer_Breweries_8_knn_data$Beer_Category )
 
 Cm_Knn <- confusionMatrix(t_knn)
 
@@ -329,7 +329,7 @@ nrow(filter(Mismatched_data, Beer_Category == "IPA" ))
 #Find the number of beer misclassified as Other Ales
 nrow(filter(Mismatched_data, Beer_Category != "IPA" ))
 
-message("We can see that around 23 beers were misclassified as 'IPA' and 51 were misclassified as 'Other Ale' ")
+message("We can see that around 68 beers were misclassified as 'IPA' and 51 were misclassified as 'Other Ale' ")
 
 #Print a few samples of the mismatched data
 #Top 6
@@ -355,7 +355,7 @@ ggplot(invaid_class) + geom_bar(mapping= aes(x= Beer_Name, fill=Beer_Category)) 
 message("We see that 2 of the 3 beers with ABV=0.050 and IBU=45 were classified at Other Ales, but one was classified as IPA")
 
 nrow(Mismatched_data)
-message("In total there are 82 beers, out of 2410, which, according to the KNN model, seem to have been incorrectly categoried as IPA or Other Ales by Budweiser")
+message("In total there are 119 beers, out of 2410, which, according to the KNN model, seem to have been incorrectly categoried as IPA or Other Ales by Budweiser")
 
 message("Take away from the analysis: 
 Conflicting ‘Beer Style’ and ‘Expected Taste’ can affect the sale of the beer, so we need to correct the classifications.
@@ -364,7 +364,7 @@ Conflicting ‘Beer Style’ and ‘Expected Taste’ can affect the sale of the
 #Renaming columns for better clarity
 colnames(Mismatched_data) <- c("Beer Id", "Beer Name","ABV","IBU","Budweiser_Beer_Category", "KNN_Predicted_Beer_Category")
 
-#List of 82 beers
+#List of 119 beers with conflicting beer_style
 print.data.frame(Mismatched_data)
 
 
@@ -372,7 +372,7 @@ print.data.frame(Mismatched_data)
 ## Take away from the analysis
 Conflicting ‘Beer Style’ and ‘Expected Taste’ can affect the sale of the beer, so we need to correct the classifications.
 
-82 beers are candidates for re-classification for Beer Style based on their Alcohol content and bitterness levels. 
+119 beers are candidates for re-classification for Beer Style based on their Alcohol content and bitterness levels. 
 
 
 
